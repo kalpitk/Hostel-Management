@@ -1,11 +1,6 @@
 <!DOCTYPE html>
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
-    crossorigin="anonymous">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"></script>
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"></script>
+{% include 'header.html' %}
+
 <html>
 
 <head>
@@ -41,20 +36,8 @@
 </head>
 
 <body>
-    <nav class="navbar navbar-dark bg-dark justify-content-between">
-        <form action="/home">
-            <button style="border: 0px solid transparent;" class="btn btn-outline-primary">HOME</button>
-        </form>
-        <form class="form-inline" action="/logout">
-            <label style="color:white; padding-right: 10px">Hi {{session.get('username')}}!</label>
-            <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Logout</button>
-        </form>
-    </nav>
-    <div class="jumbotron">
-        <center>
-            <h1 class="display-4">Hostel Management</h1>
-        </center>
-    </div>
+    {% include 'navbar.html' %}
+
     <form class="container">
         <div class="form-group row">
             <label class="col-sm-2 col-form-label"><strong>SEARCH:</strong></label>
@@ -68,7 +51,7 @@
             <tr>
                 {% for i in range(0,fields | length) %}
                 <th>{{fields[i]}}</th>
-                {%endfor%}
+                {% endfor %}
             </tr>
         </thead>
 
@@ -81,9 +64,9 @@
                 {%else%}
                 <td>{{res[i][j]}}</td>
                 {%endif%}
-                {%endfor%}
+                {% endfor %}
             </tr>
-            {%endfor%}
+            {% endfor %}
         </tbody>
     </table>
 </body>

@@ -1,4 +1,4 @@
-from flask import Flask,render_template,session,request,redirect,url_for,flash
+from flask import Flask,render_template,session,request,redirect,url_for
 import mysql.connector,hashlib 
 
 mydb = mysql.connector.connect(
@@ -47,7 +47,7 @@ def show_update_detail():
         if request.form['student_id'] =='':
             return render_template("search_detail.html")
         qry = "Select * from Student Left Join Hostel on Hostel.hostel_id = Student.hostel_id where student_id = %s" %(request.form['student_id'])
-        print(qry)
+
         not_found= False
         mycursor.execute(qry)
         res = ()
@@ -102,16 +102,6 @@ def search_detail():
         return redirect( url_for('home') )
     return render_template('search_detail.html')
 
-@app.route("/add_student_page",methods = ['POST','GET'])
-def add_student_page():
-    if not session.get('login'):
-        return redirect( url_for('home') )
-    qry = "SELECT * from Student"
-    mycursor.execute(qry)
-    fields = mycursor.column_names
-    return render_template('add_student.html',fields = fields)
-
-
 @app.route("/add_student",methods = ['POST','GET'])
 def add_detail():
     if not session.get('login'):
@@ -131,26 +121,29 @@ def add_detail():
         val = val + (temp,)
 
     qry = """INSERT INTO Student Values (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)"""%val
-    print(qry)
+
     success = True
     error = False
     try:
         mycursor.execute(qry)
+        mydb.commit()
     except:
-        print("Error")
         error = True
         success = False
-    mydb.commit()    
     
-    return render_template('/add_student.html',fields=fields,error=error,success=success)    
+    return render_template('/add_page.html',fields=fields,error=error,success=success, id='student')    
 
 
 @app.route("/add_<id>_page",methods = ['POST','GET'])
 def add_page(id):
     if not session.get('login'):
-        return redirect( url_for('home') )
-    qry = "SELECT * from " + id.capitalize()
-    mycursor.execute(qry)
+        return redirect(url_for('home'))
+    try:
+        qry = "SELECT * from " + id.capitalize()
+        mycursor.execute(qry)
+    except:
+        return redirect(url_for('home'))
+    
     fields = mycursor.column_names
 
     return render_template('add_page.html',success=request.args.get('success'), error=request.args.get('error'), fields = fields, id= id.encode('ascii','ignore'))
@@ -158,7 +151,7 @@ def add_page(id):
 @app.route("/add_room", methods=['POST','GET'])
 def add_room():
     if not session.get('login'):
-        return redirect( url_for('home') )
+        return redirect(url_for('home'))
     qry = "SELECT * from Room"
     mycursor.execute(qry)
     fields = mycursor.column_names
@@ -174,7 +167,7 @@ def add_room():
         val = val + (temp,)
 
     qry = "INSERT INTO Room Values (%s,%s,%s)"%val
-    print(qry)
+
     success = True
     error = False
     try:
@@ -208,7 +201,6 @@ def add_furniture():
 
     qry = "INSERT INTO Furniture Values (%s,%s,%s,%s)"%val
 
-    print(qry)
     success = True
     error = False
     try:
@@ -243,7 +235,6 @@ def add_warden():
 
     qry = "INSERT INTO Warden Values (%s,%s,%s,%s)"%val
 
-    print(qry)
     success = True
     error = False
     try:
@@ -277,7 +268,6 @@ def add_hostel():
 
     qry = "INSERT INTO Hostel Values (%s,%s)"%val
 
-    print(qry)
     success = True
     error = False
     try:
@@ -395,7 +385,7 @@ def room_furniture():
     furniture = mycursor.fetchall()
     
     qry = "select student_id,first_name from Student where hostel_id="+request.form['hostel_id']+" AND room_no="+request.form['room_id']
-    print(qry)
+
     mycursor.execute(qry)
     students = mycursor.fetchall()
 
@@ -438,7 +428,7 @@ def home_student():
     if not session.get('login'):
         return redirect( url_for('home') )
     qry = "Select * from Student Left Join Hostel on Hostel.hostel_id = Student.hostel_id where student_id = %s" %(session.get('username'))
-    print(qry)
+
     not_found= False
     mycursor.execute(qry)
     res = ()
@@ -533,7 +523,7 @@ def del_hostel():
     if not session.get('login'):
         return redirect( url_for('home') )
     qry = "delete from Hostel where hostel_id="+str(request.form['hostel_id'])
-    print(qry)
+
     try:
         mycursor.execute(qry)
     except:
@@ -586,8 +576,6 @@ def seen_message():
     if not session.get('login') or not session.get('isAdmin'):
         return redirect( url_for('home') )
 
-    print(request.form['id'])
-
     msg_id = request.form['id']
 
     qry = "delete from Messages where message_id=\'"+msg_id+"\'" 
@@ -596,7 +584,7 @@ def seen_message():
 
     return redirect(url_for('see_messages'))
 
-
+# TODO: Fix SQL Injection
 if __name__ == "__main__":
     app.secret_key = 'sec key'
     app.config['SESSION_TYPE'] = 'filesystem'

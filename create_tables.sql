@@ -1,4 +1,4 @@
---CREATE DATABASE PROJECT;
+CREATE DATABASE PROJECT;
 USE PROJECT;
 
 CREATE TABLE login(
@@ -7,6 +7,9 @@ CREATE TABLE login(
 );
 
 INSERT INTO login VALUES ('admin','admin');
+
+-- Student Credentials
+INSERT INTO login VALUES ('1','student');
 
 CREATE TABLE Hostel(
     hostel_id INT,
